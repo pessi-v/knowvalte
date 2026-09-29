@@ -2,7 +2,8 @@ import type { FormDataConvertible } from '@inertiajs/core'
 import { Head, Link, router, usePage } from '@inertiajs/react'
 import { Puck, type Data } from '@puckeditor/core'
 import '@puckeditor/core/puck.css'
-import '@/styles/admin.css'
+import { buttonVariants } from '@/components/ui/button'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import config from '@/puck/config'
 import type { AdminPage } from '@/types'
 
@@ -12,7 +13,7 @@ export default function Editor({ page }: Props) {
   const { flash } = usePage()
 
   return (
-    <>
+    <TooltipProvider>
       <Head title={`Editing ${page.title}`} />
       <Puck
         config={config}
@@ -27,15 +28,15 @@ export default function Editor({ page }: Props) {
         overrides={{
           headerActions: ({ children }) => (
             <>
-              {flash.notice && <span className="editor-flash" role="status">{flash.notice}</span>}
-              {flash.alert && <span className="editor-flash editor-flash--alert" role="alert">{flash.alert}</span>}
-              <Link href="/admin/pages">Back to pages</Link>
-              <a href={page.path} target="_blank" rel="noopener">View page</a>
+              {flash.notice && <span className="text-sm text-muted-foreground" role="status">{flash.notice}</span>}
+              {flash.alert && <span className="text-sm text-destructive" role="alert">{flash.alert}</span>}
+              <Link href="/admin/pages" className={buttonVariants({ variant: 'ghost' })}>Back to pages</Link>
+              <a href={page.path} target="_blank" rel="noopener" className={buttonVariants({ variant: 'ghost' })}>View page</a>
               {children}
             </>
           ),
         }}
       />
-    </>
+    </TooltipProvider>
   )
 }

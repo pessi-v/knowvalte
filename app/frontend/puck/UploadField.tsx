@@ -1,5 +1,8 @@
 import { useId, useState } from 'react'
 import type { CustomField } from '@puckeditor/core'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { csrfToken } from '@/lib/csrf'
 
 export type Upload = {
@@ -33,16 +36,16 @@ export function uploadField(label: string, accept: string): CustomField<Upload |
       const [busy, setBusy] = useState(false)
 
       return (
-        <div className="upload-field">
-          <label htmlFor={inputId} className="upload-field__label">{label}</label>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor={inputId}>{label}</Label>
           {value && (
-            <div className="upload-field__current">
-              {value.content_type.startsWith('image/') && <img src={value.url} alt="" />}
-              <span>{value.filename}</span>
-              {!readOnly && <button type="button" onClick={() => onChange(null)}>Remove</button>}
+            <div className="flex items-center gap-2 text-sm break-all">
+              {value.content_type.startsWith('image/') && <img src={value.url} alt="" className="size-12 rounded object-cover" />}
+              <span className="flex-1">{value.filename}</span>
+              {!readOnly && <Button type="button" variant="outline" size="sm" onClick={() => onChange(null)}>Remove</Button>}
             </div>
           )}
-          <input
+          <Input
             id={inputId}
             type="file"
             accept={accept}
@@ -62,8 +65,8 @@ export function uploadField(label: string, accept: string): CustomField<Upload |
               }
             }}
           />
-          {busy && <p>Uploading…</p>}
-          {error && <p role="alert" className="upload-field__error">{error}</p>}
+          {busy && <p className="text-sm text-muted-foreground">Uploading…</p>}
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         </div>
       )
     },

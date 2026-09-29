@@ -1,5 +1,9 @@
 import type { Config, Slot } from '@puckeditor/core'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import { FileText } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { Card as UiCard, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { uploadField, type Upload } from './UploadField'
 
 // Components editors can place on pages. Rendering is shared by the editor
@@ -73,6 +77,29 @@ const gapField = {
   ],
 } as const
 
+// Full class names so Tailwind can find them.
+const GAP_CLASSES: Record<Gap, string> = { none: 'gap-0', small: 'gap-3', medium: 'gap-6', large: 'gap-12' }
+const JUSTIFY_CLASSES = { start: 'justify-start', center: 'justify-center', end: 'justify-end', 'space-between': 'justify-between' }
+const ALIGN_CLASSES = { stretch: 'items-stretch', start: 'items-start', center: 'items-center', end: 'items-end' }
+
+// shadcn's buttons are sized for app screens; public-site buttons are larger.
+const SITE_BUTTON = 'h-11 px-5 text-base'
+
+const HEADING_CLASSES = {
+  h2: 'mt-10 mb-3 text-3xl font-semibold tracking-tight',
+  h3: 'mt-8 mb-2 text-2xl font-semibold',
+  h4: 'mt-6 mb-2 text-xl font-semibold',
+}
+const SECTION_CLASSES = {
+  none: '',
+  muted: 'bg-muted',
+  brand: 'bg-primary text-primary-foreground [&_.prose]:prose-invert',
+}
+
+function Placeholder({ children }: { children: ReactNode }) {
+  return <p className="rounded-lg border-2 border-dashed p-8 text-center text-muted-foreground">{children}</p>
+}
+
 // Blocks that belong at page level, not inside a layout block.
 const PAGE_LEVEL = ['Hero', 'PageHeader', 'Section']
 
@@ -83,7 +110,7 @@ function youtubeEmbedUrl(url: string) {
 
 export const config: Config<Props> = {
   // Page title, URL and description live in the page settings, not in Puck.
-  root: { fields: {}, render: ({ children }) => <>{children}</> },
+  root: { fields: {}, render: ({ children }) => <div className="page-content">{children}</div> },
   categories: {
     layout: { title: 'Layout', components: ['Section', 'Grid', 'Flex'] },
     text: { title: 'Text', components: ['PageHeader', 'Hero', 'Heading', 'RichText', 'Button'] },
@@ -101,13 +128,13 @@ export const config: Config<Props> = {
       },
       defaultProps: { title: 'Page title', text: '', linkLabel: '', linkUrl: '', image: null, alt: '', decorative: false },
       render: ({ title, text, linkLabel, linkUrl, ...image }) => (
-        <header className="hero">
-          <div className="hero__body">
-            <h1>{title}</h1>
-            {text && <p className="hero__text">{text}</p>}
-            {linkLabel && linkUrl && <a className="button" href={linkUrl}>{linkLabel}</a>}
+        <header className={cn('grid items-center gap-8 py-12', image.image && 'md:grid-cols-2')}>
+          <div className="flex flex-col items-start gap-4">
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
+            {text && <p className="text-xl text-muted-foreground">{text}</p>}
+            {linkLabel && linkUrl && <a className={cn(buttonVariants(), SITE_BUTTON)} href={linkUrl}>{linkLabel}</a>}
           </div>
-          <Img className="hero__image" {...image} />
+          <Img className="rounded-xl" {...image} />
         </header>
       ),
     },
@@ -119,9 +146,9 @@ export const config: Config<Props> = {
       },
       defaultProps: { title: 'Page title', intro: '' },
       render: ({ title, intro }) => (
-        <header className="page-header">
-          <h1>{title}</h1>
-          {intro && <p className="lead">{intro}</p>}
+        <header className="flex flex-col gap-3 pt-8 pb-4">
+          <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
+          {intro && <p className="max-w-3xl text-xl text-muted-foreground">{intro}</p>}
         </header>
       ),
     },
@@ -139,25 +166,29 @@ export const config: Config<Props> = {
         },
       },
       defaultProps: { text: 'Heading', level: 'h2' },
-      render: ({ text, level: Tag }) => <Tag>{text}</Tag>,
+      render: ({ text, level: Tag }) => <Tag className={HEADING_CLASSES[Tag]}>{text}</Tag>,
     },
     RichText: {
       label: 'Text',
       fields: { text: { type: 'richtext', label: 'Text', contentEditable: true } },
       defaultProps: { text: '<p>Write something…</p>' },
-      render: ({ text }) => <div className="prose">{text}</div>,
+      render: ({ text }) => (
+        <div className="my-4">
+          <div className="prose max-w-prose prose-neutral">{text}</div>
+        </div>
+      ),
     },
     Image: {
       fields: { ...imageFields, caption: { type: 'text', label: 'Caption' } },
       defaultProps: { image: null, alt: '', decorative: false, caption: '' },
       render: ({ caption, ...image }) =>
         image.image ? (
-          <figure className="figure">
-            <Img {...image} />
-            {caption && <figcaption>{caption}</figcaption>}
+          <figure className="my-8">
+            <Img className="rounded-lg" {...image} />
+            {caption && <figcaption className="mt-2 text-sm text-muted-foreground">{caption}</figcaption>}
           </figure>
         ) : (
-          <p className="placeholder">Choose an image</p>
+          <Placeholder>Choose an image</Placeholder>
         ),
     },
     Button: {
@@ -172,7 +203,7 @@ export const config: Config<Props> = {
       },
       defaultProps: { label: 'Read more', url: '/', variant: 'primary' },
       render: ({ label, url, variant }) => (
-        <p><a className={`button button--${variant}`} href={url}>{label}</a></p>
+        <div className="my-4"><a className={cn(buttonVariants({ variant: variant === 'primary' ? 'default' : 'outline' }), SITE_BUTTON)} href={url}>{label}</a></div>
       ),
     },
     // Equal columns that collapse to fewer columns on narrow screens.
@@ -189,7 +220,10 @@ export const config: Config<Props> = {
       },
       defaultProps: { columns: 3, gap: 'medium', items: [] },
       render: ({ columns, gap = 'medium', items: Items }) => (
-        <Items className={`grid gap--${gap}`} style={{ '--columns': columns } as React.CSSProperties} />
+        <Items
+          className={cn('my-8 grid grid-cols-[repeat(auto-fit,minmax(min(100%,var(--col-min)),1fr))]', GAP_CLASSES[gap])}
+          style={{ '--col-min': `calc(72rem / ${columns} - 3rem)` } as CSSProperties}
+        />
       ),
     },
     // Items in a row or column, for things like button groups or logos.
@@ -239,8 +273,13 @@ export const config: Config<Props> = {
       },
       render: ({ direction, justify, align, itemWidth, wrap, gap, items: Items }) => (
         <Items
-          className={`flex flex--${direction} gap--${gap}${itemWidth === 'equal' ? ' flex--equal' : ''}${wrap ? ' flex--wrap' : ''}`}
-          style={{ justifyContent: justify, alignItems: align }}
+          className={cn(
+            'my-8 flex',
+            direction === 'column' ? 'flex-col' : 'flex-row',
+            wrap && 'flex-wrap',
+            itemWidth === 'equal' && direction === 'row' && '*:min-w-[min(100%,12rem)] *:flex-1',
+            JUSTIFY_CLASSES[justify], ALIGN_CLASSES[align], GAP_CLASSES[gap],
+          )}
         />
       ),
     },
@@ -254,12 +293,18 @@ export const config: Config<Props> = {
       },
       defaultProps: { title: 'Card title', text: '', linkLabel: '', linkUrl: '', image: null, alt: '', decorative: true },
       render: ({ title, text, linkLabel, linkUrl, ...image }) => (
-        <article className="card">
-          <Img className="card__image" {...image} />
-          <h3>{title}</h3>
-          {text && <p>{text}</p>}
-          {linkUrl && <a href={linkUrl}>{linkLabel || 'Read more'}<span className="visually-hidden">: {title}</span></a>}
-        </article>
+        <UiCard className="h-full">
+          <Img {...image} />
+          <CardHeader>
+            <CardTitle><h3 className="text-lg font-semibold">{title}</h3></CardTitle>
+            {text && <CardDescription className="text-base">{text}</CardDescription>}
+          </CardHeader>
+          {linkUrl && (
+            <CardContent className="mt-auto">
+              <a href={linkUrl} className="font-medium underline">{linkLabel || 'Read more'}<span className="sr-only">: {title}</span></a>
+            </CardContent>
+          )}
+        </UiCard>
       ),
     },
     Download: {
@@ -272,15 +317,18 @@ export const config: Config<Props> = {
       defaultProps: { file: null, label: '', description: '' },
       render: ({ file, label, description }) =>
         file ? (
-          <div className="download">
-            <a href={file.url} download>
-              {label || file.filename}
-              <span className="download__meta"> ({fileType(file)}, {formatSize(file.byte_size)})</span>
-            </a>
-            {description && <p>{description}</p>}
+          <div className="my-4 flex gap-3">
+            <FileText aria-hidden="true" className="mt-1 size-5 shrink-0 text-muted-foreground" />
+            <div>
+              <a href={file.url} download className="font-semibold underline">
+                {label || file.filename}
+                <span className="font-normal text-muted-foreground"> ({fileType(file)}, {formatSize(file.byte_size)})</span>
+              </a>
+              {description && <p className="text-muted-foreground">{description}</p>}
+            </div>
           </div>
         ) : (
-          <p className="placeholder">Choose a file</p>
+          <Placeholder>Choose a file</Placeholder>
         ),
     },
     Video: {
@@ -293,12 +341,12 @@ export const config: Config<Props> = {
       render: ({ url, title }) => {
         const src = youtubeEmbedUrl(url)
         return src ? (
-          <div className="video">
-            <iframe src={src} title={title || 'YouTube video'} loading="lazy" allowFullScreen
+          <div className="my-8 aspect-video">
+            <iframe src={src} title={title || 'YouTube video'} loading="lazy" allowFullScreen className="size-full rounded-lg"
               allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" />
           </div>
         ) : (
-          <p className="placeholder">Paste a YouTube URL</p>
+          <Placeholder>Paste a YouTube URL</Placeholder>
         )
       },
     },
@@ -310,15 +358,15 @@ export const config: Config<Props> = {
           options: [
             { label: 'None', value: 'none' },
             { label: 'Muted', value: 'muted' },
-            { label: 'Brand colour', value: 'brand' },
+            { label: 'Dark', value: 'brand' },
           ],
         },
         content: { type: 'slot', label: 'Content', disallow: PAGE_LEVEL },
       },
       defaultProps: { background: 'none', content: [] },
       render: ({ background, content: Content }) => (
-        <section className={`section section--${background}`}>
-          <Content className="section__inner" />
+        <section data-full-bleed className={cn('py-12', SECTION_CLASSES[background])}>
+          <Content className="page-container" />
         </section>
       ),
     },

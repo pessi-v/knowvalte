@@ -1,25 +1,27 @@
-import { Form, Head } from '@inertiajs/react'
+import { Form } from '@inertiajs/react'
+import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import AuthCard from './AuthCard'
 
 export default function ResetPassword({ token }: { token: string }) {
   return (
-    <div className="container narrow">
-      <Head title="Choose a new password" />
-      <h1>Choose a new password</h1>
-      <Form action={`/passwords/${token}`} method="put" className="stack">
+    <AuthCard title="Choose a new password">
+      <Form action={`/passwords/${token}`} method="put">
         {({ processing }) => (
-          <>
-            <div className="field">
-              <label htmlFor="password">New password</label>
-              <input id="password" type="password" name="password" autoComplete="new-password" required maxLength={72} />
-            </div>
-            <div className="field">
-              <label htmlFor="password_confirmation">Repeat new password</label>
-              <input id="password_confirmation" type="password" name="password_confirmation" autoComplete="new-password" required maxLength={72} />
-            </div>
-            <button type="submit" className="button" disabled={processing}>Save</button>
-          </>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="password">New password</FieldLabel>
+              <Input id="password" type="password" name="password" autoComplete="new-password" required maxLength={72} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password_confirmation">Repeat new password</FieldLabel>
+              <Input id="password_confirmation" type="password" name="password_confirmation" autoComplete="new-password" required maxLength={72} />
+            </Field>
+            <Button type="submit" disabled={processing}>Save</Button>
+          </FieldGroup>
         )}
       </Form>
-    </div>
+    </AuthCard>
   )
 }

@@ -1,7 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react'
 import SiteLayout from '@/layouts/SiteLayout'
 import AdminLayout from '@/layouts/AdminLayout'
-import '@/styles/site.css'
+import '@/styles/app.css'
 
 void createInertiaApp({
   pages: '../pages',

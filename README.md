@@ -11,6 +11,9 @@ authentication, Kamal) plus:
   bundled by [Vite Ruby](https://vite-ruby.netlify.app). Every screen is an
   Inertia page in `app/frontend/pages`.
 - [Puck](https://puckeditor.com) (`@puckeditor/core`) as the visual page editor.
+- [Tailwind CSS](https://tailwindcss.com) v4 and [shadcn/ui](https://ui.shadcn.com)
+  components (Base UI primitives, "nova" style) in `app/frontend/components/ui`.
+  Add more with `npx shadcn@latest add <component>`; they're our code, so edit freely.
 
 ## Development
 
@@ -54,7 +57,9 @@ bin/dev            # or PORT=3100 bin/dev if port 3000 is taken
 - **Layouts**: `app/frontend/layouts` (public site and admin), picked by page
   name in `app/frontend/entrypoints/inertia.tsx`. Menus and social links are
   shared props from `InertiaController`; social links are in `config/site.yml`.
-  Styles are plain CSS in `app/frontend/styles`.
+  Styles are Tailwind classes in the components. `app/frontend/styles/app.css`
+  holds the theme (colours as CSS variables, e.g. `--primary`), base styles and
+  the `page-container` utility. Rich text uses the Tailwind typography plugin.
 - **Users**: Rails' authentication generator (`User`, `Session`, password
   reset). There is no sign-up; create users in the console or with the seed
   variables above. Every signed-in user can edit everything.
@@ -77,7 +82,7 @@ so back up that volume.
 
 - News and events as structured content (list pages, dates, archive), and a
   contact form with spam protection.
-- Brand colours, fonts and logo (`app/frontend/styles/site.css`), favicon in
+- Brand colours, fonts and logo (theme variables in `app/frontend/styles/app.css`), favicon in
   `public/`, and the official EU emblem and funding statement in
   `app/frontend/layouts/SiteLayout.tsx`.
 - Real social media URLs (`config/site.yml`).

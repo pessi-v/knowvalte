@@ -1,26 +1,28 @@
-import { Form, Head, Link } from '@inertiajs/react'
+import { Form, Link } from '@inertiajs/react'
+import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import AuthCard from './AuthCard'
 
 export default function SignIn() {
   return (
-    <div className="container narrow">
-      <Head title="Sign in" />
-      <h1>Sign in</h1>
-      <Form action="/session" method="post" className="stack">
+    <AuthCard title="Sign in">
+      <Form action="/session" method="post">
         {({ processing }) => (
-          <>
-            <div className="field">
-              <label htmlFor="email_address">Email address</label>
-              <input id="email_address" type="email" name="email_address" autoComplete="username" required autoFocus />
-            </div>
-            <div className="field">
-              <label htmlFor="password">Password</label>
-              <input id="password" type="password" name="password" autoComplete="current-password" required maxLength={72} />
-            </div>
-            <button type="submit" className="button" disabled={processing}>Sign in</button>
-          </>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="email_address">Email address</FieldLabel>
+              <Input id="email_address" type="email" name="email_address" autoComplete="username" required autoFocus />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input id="password" type="password" name="password" autoComplete="current-password" required maxLength={72} />
+            </Field>
+            <Button type="submit" disabled={processing}>Sign in</Button>
+            <Link href="/passwords/new" className="text-sm text-muted-foreground underline hover:text-foreground">Forgot password?</Link>
+          </FieldGroup>
         )}
       </Form>
-      <p><Link href="/passwords/new">Forgot password?</Link></p>
-    </div>
+    </AuthCard>
   )
 }

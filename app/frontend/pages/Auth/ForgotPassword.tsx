@@ -1,21 +1,23 @@
-import { Form, Head } from '@inertiajs/react'
+import { Form } from '@inertiajs/react'
+import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import AuthCard from './AuthCard'
 
 export default function ForgotPassword() {
   return (
-    <div className="container narrow">
-      <Head title="Forgot your password?" />
-      <h1>Forgot your password?</h1>
-      <Form action="/passwords" method="post" className="stack">
+    <AuthCard title="Forgot your password?">
+      <Form action="/passwords" method="post">
         {({ processing }) => (
-          <>
-            <div className="field">
-              <label htmlFor="email_address">Email address</label>
-              <input id="email_address" type="email" name="email_address" autoComplete="username" required autoFocus />
-            </div>
-            <button type="submit" className="button" disabled={processing}>Email reset instructions</button>
-          </>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="email_address">Email address</FieldLabel>
+              <Input id="email_address" type="email" name="email_address" autoComplete="username" required autoFocus />
+            </Field>
+            <Button type="submit" disabled={processing}>Email reset instructions</Button>
+          </FieldGroup>
         )}
       </Form>
-    </div>
+    </AuthCard>
   )
 }

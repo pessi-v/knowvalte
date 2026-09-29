@@ -1,10 +1,23 @@
 import { Form, Head, Link } from '@inertiajs/react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import type { AdminPage } from '@/types'
 
-function FieldError({ errors, name }: { errors: Record<string, string | string[]>; name: string }) {
+const MENU_OPTIONS = [
+  { value: 'none', label: 'No menu' },
+  { value: 'main', label: 'Main navigation' },
+  { value: 'footer', label: 'Footer' },
+]
+
+function errorsFor(errors: Record<string, string | string[]>, name: string) {
   const error = errors[name]
-  if (!error) return null
-  return <p className="field-error" id={`${name}-error`}>{Array.isArray(error) ? error.join(', ') : error}</p>
+  if (!error) return undefined
+  return (Array.isArray(error) ? error : [error]).map((message) => ({ message }))
 }
 
 export default function PageForm({ page }: { page: AdminPage }) {
@@ -14,63 +27,66 @@ export default function PageForm({ page }: { page: AdminPage }) {
   return (
     <>
       <Head title={title} />
-      <h1>{title}</h1>
-      <Form
-        action={isNew ? '/admin/pages' : `/admin/pages/${page.id}`}
-        method={isNew ? 'post' : 'patch'}
-        className="admin-form"
-      >
-        {({ errors, processing }) => (
-          <>
-            <div className="field">
-              <label htmlFor="title">Title</label>
-              <input id="title" name="page[title]" defaultValue={page.title ?? ''} required
-                aria-describedby={errors.title ? 'title-error' : undefined} />
-              <FieldError errors={errors} name="title" />
-            </div>
-            <div className="field">
-              <label htmlFor="slug">URL</label>
-              <div className="input-prefix">
-                <span aria-hidden="true">/</span>
-                <input id="slug" name="page[slug]" defaultValue={page.slug ?? ''} required
-                  aria-describedby={`slug-hint${errors.slug ? ' slug-error' : ''}`} />
-              </div>
-              <p className="hint" id="slug-hint">Lowercase letters, numbers and dashes. The home page is “home”.</p>
-              <FieldError errors={errors} name="slug" />
-            </div>
-            <div className="field">
-              <label htmlFor="meta_description">Description for search engines and link previews</label>
-              <textarea id="meta_description" name="page[meta_description]" rows={2}
-                defaultValue={page.meta_description ?? ''} />
-            </div>
-            <div className="field-row">
-              <div className="field">
-                <label htmlFor="menu">Show in</label>
-                <select id="menu" name="page[menu]" defaultValue={page.menu}>
-                  <option value="none">No menu</option>
-                  <option value="main">Main navigation</option>
-                  <option value="footer">Footer</option>
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="position">Menu position</label>
-                <input id="position" name="page[position]" type="number" defaultValue={page.position} />
-              </div>
-            </div>
-            <div className="field field--checkbox">
-              <input type="hidden" name="page[published]" value="0" />
-              <input id="published" type="checkbox" name="page[published]" value="1" defaultChecked={page.published} />
-              <label htmlFor="published">Published (visible to everyone)</label>
-            </div>
-            <div className="actions">
-              <button type="submit" className="button" disabled={processing}>
-                {isNew ? 'Create and edit content' : 'Save settings'}
-              </button>
-              <Link href="/admin/pages">Cancel</Link>
-            </div>
-          </>
-        )}
-      </Form>
+      <h1 className="py-6 text-2xl font-semibold">{title}</h1>
+      <Card className="max-w-2xl">
+        <CardContent>
+          <Form action={isNew ? '/admin/pages' : `/admin/pages/${page.id}`} method={isNew ? 'post' : 'patch'}>
+            {({ errors, processing }) => (
+              <FieldGroup>
+                <Field data-invalid={!!errors.title || undefined}>
+                  <FieldLabel htmlFor="title">Title</FieldLabel>
+                  <Input id="title" name="page[title]" defaultValue={page.title ?? ''} required
+                    aria-invalid={!!errors.title || undefined} />
+                  <FieldError errors={errorsFor(errors, 'title')} />
+                </Field>
+                <Field data-invalid={!!errors.slug || undefined}>
+                  <FieldLabel htmlFor="slug">URL</FieldLabel>
+                  <div className="flex items-center gap-1">
+                    <span aria-hidden="true" className="text-muted-foreground">/</span>
+                    <Input id="slug" name="page[slug]" defaultValue={page.slug ?? ''} required
+                      aria-describedby="slug-hint" aria-invalid={!!errors.slug || undefined} />
+                  </div>
+                  <FieldDescription id="slug-hint">Lowercase letters, numbers and dashes. The home page is “home”.</FieldDescription>
+                  <FieldError errors={errorsFor(errors, 'slug')} />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="meta_description">Description for search engines and link previews</FieldLabel>
+                  <Textarea id="meta_description" name="page[meta_description]" rows={2}
+                    defaultValue={page.meta_description ?? ''} />
+                </Field>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field>
+                    <FieldLabel htmlFor="menu">Show in</FieldLabel>
+                    <Select name="page[menu]" defaultValue={page.menu} items={MENU_OPTIONS}>
+                      <SelectTrigger id="menu" className="w-full"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {MENU_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="position">Menu position</FieldLabel>
+                    <Input id="position" name="page[position]" type="number" defaultValue={page.position} />
+                  </Field>
+                </div>
+                <Field orientation="horizontal">
+                  <input type="hidden" name="page[published]" value="0" />
+                  <Checkbox id="published" name="page[published]" value="1" defaultChecked={page.published} />
+                  <FieldLabel htmlFor="published">Published (visible to everyone)</FieldLabel>
+                </Field>
+                <div className="flex items-center gap-3">
+                  <Button type="submit" disabled={processing}>
+                    {isNew ? 'Create and edit content' : 'Save settings'}
+                  </Button>
+                  <Link href="/admin/pages" className={buttonVariants({ variant: 'ghost' })}>Cancel</Link>
+                </div>
+              </FieldGroup>
+            )}
+          </Form>
+        </CardContent>
+      </Card>
     </>
   )
 }
