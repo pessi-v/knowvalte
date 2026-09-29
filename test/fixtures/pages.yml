@@ -1,0 +1,25 @@
+home:
+  title: Home
+  slug: home
+  published: true
+  content: <%= { root: { props: {} }, content: [ { type: "Hero", props: { id: "Hero-1", title: "Welcome" } } ] }.to_json %>
+
+about:
+  title: About
+  slug: about
+  menu: main
+  position: 1
+  published: true
+
+draft:
+  title: Draft page
+  slug: draft
+  menu: main
+  position: 2
+  published: false
+
+privacy:
+  title: Privacy notice
+  slug: privacy
+  menu: footer
+  published: true

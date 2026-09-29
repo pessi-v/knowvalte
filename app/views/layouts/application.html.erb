@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title data-inertia><%= content_for(:title) || "KnowValTE" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="application-name" content="KnowValTE">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app %>
+    <%= vite_react_refresh_tag %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag "inertia.tsx" %>
+    <%= inertia_ssr_head %>
+
+    <%# Umami: cookieless analytics, so no consent banner is needed. Tracks Inertia navigations too. %>
+    <% if ENV["UMAMI_SCRIPT_URL"].present? && ENV["UMAMI_WEBSITE_ID"].present? %>
+      <script defer src="<%= ENV["UMAMI_SCRIPT_URL"] %>" data-website-id="<%= ENV["UMAMI_WEBSITE_ID"] %>"></script>
+    <% end %>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

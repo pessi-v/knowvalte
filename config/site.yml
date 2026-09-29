@@ -1,0 +1,9 @@
+# Site-wide settings, read with Rails.configuration.x.site (see config/application.rb).
+shared:
+  social:
+    - name: LinkedIn
+      url: https://www.linkedin.com/ # TODO: project page
+    - name: Bluesky
+      url: https://bsky.app/ # TODO: project profile
+    - name: YouTube
+      url: https://www.youtube.com/ # TODO: project channel
